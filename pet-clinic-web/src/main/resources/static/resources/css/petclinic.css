@@ -2926,7 +2926,7 @@ textarea.form-control-lg {
 .nav-justified > .nav-link,
 .nav-justified .nav-item {
   flex-basis: 0;
-  flex-grow: 1;
+  /*flex-grow: 1;*/
   text-align: center; }
 
 .nav-fill .nav-item .nav-link,
@@ -2944,7 +2944,7 @@ textarea.form-control-lg {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: space-between;
+  justify-content: space-around;
   padding-top: 0.5rem;
   padding-bottom: 0.5rem; }
   .navbar > .container,
@@ -2985,7 +2985,7 @@ textarea.form-control-lg {
 
 .navbar-collapse {
   flex-basis: 100%;
-  flex-grow: 1;
+  /*flex-grow: 1;*/
   align-items: center; }
 
 .navbar-toggler {
