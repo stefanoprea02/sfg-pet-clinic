@@ -6,6 +6,7 @@ import guru.springframework.sfgpetclinic.model.PetType;
 import guru.springframework.sfgpetclinic.services.OwnerService;
 import guru.springframework.sfgpetclinic.services.PetService;
 import guru.springframework.sfgpetclinic.services.PetTypeService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
@@ -14,8 +15,11 @@ import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.beans.PropertyEditorSupport;
+import java.time.LocalDate;
 import java.util.Collection;
 
+@Slf4j
 @Controller
 @RequestMapping("/owners/{ownerId}")
 public class PetController {
@@ -46,12 +50,27 @@ public class PetController {
         dataBinder.setDisallowedFields("id");
     }
 
-    @GetMapping("/pets/new")
-    public String initCreationForm(Owner owner, Model model){
+    @InitBinder
+    public void setAllowedFields(WebDataBinder dataBinder){
+        dataBinder.registerCustomEditor(LocalDate.class, new PropertyEditorSupport(){
+            @Override
+            public void setAsText(String text) throws IllegalArgumentException{
+                setValue(LocalDate.parse(text));
+            }
+        });
+    }
+
+    @ModelAttribute("pet")
+    public Pet loadPet(Owner owner, Model model){
         Pet pet = new Pet();
         owner.getPets().add(pet);
         pet.setOwner(owner);
         model.addAttribute("pet", pet);
+        return pet;
+    }
+
+    @GetMapping("/pets/new")
+    public String initCreationForm(Owner owner, Model model){
         return VIEWS_PETS_CREATE_OR_UPDATE_FORM;
     }
 
@@ -60,9 +79,7 @@ public class PetController {
         if(StringUtils.hasLength(pet.getName()) && pet.isNew() && owner.getPet(pet.getName(), true) != null){
             result.rejectValue("name", "duplicate", "already exists");
         }
-        owner.getPets().add(pet);
         if(result.hasErrors()){
-            model.addAttribute("pet", pet);
             return VIEWS_PETS_CREATE_OR_UPDATE_FORM;
         }else{
             petService.save(pet);
